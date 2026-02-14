@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Compass - Find Your Perfect Tech Career</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <!-- Theme Toggle Switch -->
+    <div class="theme-switch-container">
+        <label class="theme-switch">
+            <input type="checkbox" id="themeToggle">
+            <span class="slider">
+                <span class="sun-icon">☀️</span>
+                <span class="moon-icon">🌙</span>
+            </span>
+        </label>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 class="header-title">🚀 Career Compass</h1>
+                    <p class="header-subtitle">Discover your perfect tech career with AI-powered matching</p>
+                </div>
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                    {% if is_parent %}
+                    <a href="/dashboard" class="btn btn-primary">👨‍👩‍👧‍👦 Dashboard</a>
+                    {% else %}
+                    <a href="/student-dashboard" class="btn btn-primary">📊 My Dashboard</a>
+                    {% endif %}
+                    <a href="/logout" class="btn btn-secondary">Logout</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Input Form Card -->
+        <div class="form-card">
+            <h2 class="form-title">Tell Us About Yourself</h2>
+
+            <form id="careerForm">
+                <!-- Name -->
+                <div class="form-group">
+                    <label class="form-label" for="name">👤 Your Name</label>
+                    <input type="text" id="name" class="form-input" placeholder="Enter your name" required>
+                </div>
+
+                <!-- Specialization -->
+                <!-- Specialization -->
+                <div class="form-group">
+                    <label class="form-label">🎓 Your Specialization</label>
+                    <div class="skills-grid radio-grid">
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="specialization" value="Software Engineering" required
+                                class="skill-checkbox">
+                            <span class="skill-label">Software Engineering</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="specialization" value="AI & ML" class="skill-checkbox">
+                            <span class="skill-label">AI & ML</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="specialization" value="Cloud Computing" class="skill-checkbox">
+                            <span class="skill-label">Cloud Computing</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="specialization" value="Data Science" class="skill-checkbox">
+                            <span class="skill-label">Data Science</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="specialization" value="Cyber Security" class="skill-checkbox">
+                            <span class="skill-label">Cyber Security</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="specialization" value="Computer Networks" class="skill-checkbox">
+                            <span class="skill-label">Computer Networks</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="specialization" value="Mobile Computing" class="skill-checkbox">
+                            <span class="skill-label">Mobile Computing</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Current Year -->
+                <!-- Current Year -->
+                <div class="form-group">
+                    <label class="form-label">📚 Current Year of Study</label>
+                    <div class="skills-grid radio-grid">
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="currentYear" value="1" required class="skill-checkbox">
+                            <span class="skill-label">1st Year</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="currentYear" value="2" class="skill-checkbox">
+                            <span class="skill-label">2nd Year</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="currentYear" value="3" class="skill-checkbox">
+                            <span class="skill-label">3rd Year</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="currentYear" value="4" class="skill-checkbox">
+                            <span class="skill-label">4th Year</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="currentYear" value="5" class="skill-checkbox">
+                            <span class="skill-label">Graduated</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Skills Selection -->
+                <div class="form-group">
+                    <label class="form-label">💪 Your Skills (Select all that apply)</label>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        Click on skills and select your proficiency level
+                    </p>
+                    <div class="skills-grid" id="skillsGrid">
+                        <!-- Skills will be populated here -->
+                    </div>
+                </div>
+
+
+
+
+
+                <!-- Interest Areas -->
+                <div class="form-group">
+                    <label class="form-label">❤️ Areas of Interest (Select up to 3)</label>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" class="interest-checkbox" value="Software Engineering">
+                            <span>Software Engineering</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" class="interest-checkbox" value="AI/ML">
+                            <span>AI/ML</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" class="interest-checkbox" value="Cloud Computing">
+                            <span>Cloud Computing</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" class="interest-checkbox" value="Data Science">
+                            <span>Data Science</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" class="interest-checkbox" value="Cybersecurity">
+                            <span>Cybersecurity</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" class="interest-checkbox" value="Mobile Development">
+                            <span>Mobile Development</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Career Goal -->
+                <!-- Career Goal -->
+                <div class="form-group">
+                    <label class="form-label">🎯 Your Career Goal</label>
+                    <div class="skills-grid radio-grid">
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="careerGoal" value="First Job" required class="skill-checkbox">
+                            <span class="skill-label">First Job</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="careerGoal" value="Switch Role" class="skill-checkbox">
+                            <span class="skill-label">Switch Role</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="careerGoal" value="Specialize" class="skill-checkbox">
+                            <span class="skill-label">Specialize</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="careerGoal" value="Startup" class="skill-checkbox">
+                            <span class="skill-label">Startup</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <!-- Timeline -->
+                <div class="form-group">
+                    <label class="form-label">⏰ When do you want to be job-ready?</label>
+                    <div class="skills-grid radio-grid">
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="timeline" value="3 months" required class="skill-checkbox">
+                            <span class="skill-label">3 months</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="timeline" value="6 months" checked class="skill-checkbox">
+                            <span class="skill-label">6 months</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="timeline" value="1 year" class="skill-checkbox">
+                            <span class="skill-label">1 year</span>
+                        </label>
+                        <label class="skill-item radio-card">
+                            <input type="radio" name="timeline" value="2 years" class="skill-checkbox">
+                            <span class="skill-label">2 years</span>
+                        </label>
+                    </div>
+                </div>
+
+
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-large">
+                    <span>Find My Perfect Career</span>
+                    <span>→</span>
+                </button>
+            </form>
+
+            <!-- Loading Spinner (Hidden) -->
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Analyzing your profile and matching careers...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

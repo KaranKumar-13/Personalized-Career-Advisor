@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Roadmap - Career Compass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Additional roadmap-specific styles */
+        .roadmap-container {
+            margin-top: 2rem;
+        }
+
+        .roadmap-phase {
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .phase-header {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+
+        .phase-number {
+            min-width: 70px;
+            height: 70px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .phase-info {
+            flex: 1;
+        }
+
+        .phase-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .phase-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .phase-duration {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: var(--gradient-secondary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .topics-flowchart {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .topic-box {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform var(--transition-base);
+        }
+
+        .topic-box:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .topic-box:hover::before {
+            transform: scaleX(1);
+        }
+
+        .topic-box.checkpoint {
+            background: var(--gradient-warm);
+            color: white;
+            border-color: transparent;
+        }
+
+        .topic-box.checkpoint .topic-name,
+        .topic-box.checkpoint .topic-description {
+            color: white;
+        }
+
+        .topic-box.essential {
+            border-color: var(--warning);
+            border-width: 3px;
+        }
+
+        .topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+        }
+
+        .topic-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .essential-badge {
+            background: var(--warning);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .checkpoint-badge {
+            background: white;
+            color: #fa709a;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .topic-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .topic-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topic-type {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            font-weight: 500;
+        }
+
+        .learn-btn {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius-sm);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all var(--transition-base);
+        }
+
+        .learn-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .checkpoint-message {
+            background: var(--gradient-warm);
+            color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .completion-card {
+            background: var(--gradient-primary);
+            border-radius: var(--border-radius-lg);
+            padding: 3rem;
+            text-align: center;
+            margin-top: 3rem;
+            color: white;
+        }
+
+        .completion-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .completion-card h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .completion-card p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle">
+        <span class="theme-toggle-icon">🌙</span>
+        <span class="theme-toggle-text">Dark Mode</span>
+    </button>
+
+    <div class="container">
+        <!-- Back Button -->
+        <button onclick="history.back()" class="btn btn-secondary" style="margin-bottom: 1rem;">
+            ← Back to Career Matches
+        </button>
+
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title" id="roleTitle">Loading...</h1>
+            <p class="header-subtitle" id="roleDescription">Your personalized learning path</p>
+        </header>
+
+        <!-- Roadmap Container -->
+        <div class="roadmap-container" id="roadmapContainer">
+            <!-- Phases will be inserted here -->
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading your personalized roadmap...</p>
+        </div>
+    </div>
+
+    <script>
+        const roleId = {{ role_id }};
+        const container = document.getElementById('roadmapContainer');
+        let completedTopicIds = [];
+
+        // Toggle topic completion
+        async function toggleTopicProgress(topicId, completed) {
+            try {
+                const response = await fetch('/api/progress/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        role_id: roleId,
+                        topic_id: topicId,
+                        completed: completed
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update local completed list
+                    if (completed) {
+                        if (!completedTopicIds.includes(topicId)) {
+                            completedTopicIds.push(topicId);
+                        }
+                    } else {
+                        completedTopicIds = completedTopicIds.filter(id => id !== topicId);
+                    }
+
+                    // Update topic box styling
+                    const checkbox = document.getElementById(`topic-${topicId}`);
+                    const topicBox = checkbox.closest('.topic-box');
+                    if (completed) {
+                        topicBox.style.opacity = '0.7';
+                        topicBox.style.borderColor = 'var(--success)';
+                    } else {
+                        topicBox.style.opacity = '1';
+                        topicBox.style.borderColor = '';
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to update progress:', error);
+                // Revert checkbox on error
+                document.getElementById(`topic-${topicId}`).checked = !completed;
+            }
+        }
+
+        // Fetch progress first, then roadmap
+        async function loadRoadmapWithProgress() {
+            try {
+                // Load progress
+                const progressResponse = await fetch(`/api/progress/${roleId}`);
+                const progressData = await progressResponse.json();
+                if (progressData.success) {
+                    completedTopicIds = progressData.completed_topics;
+                }
+            } catch (error) {
+                console.error('Failed to load progress:', error);
+            }
+
+            // Then load roadmap
+            fetch(`/api/roadmap/${roleId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        renderRoadmap(data);
+                    } else {
+                        alert('No roadmap available for this role yet. Coming soon!');
+                        window.location.href = '/roles';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Show placeholder roadmap
+                    showPlaceholderRoadmap();
+                });
+
+            function renderRoadmap(data) {
+                document.getElementById('loading').style.display = 'none';
+
+                // Update header
+                document.getElementById('roleTitle').textContent =
+                    `🎯 ${data.role.role_name} Roadmap`;
+                document.getElementById('roleDescription').textContent =
+                    data.role.description;
+
+                if (!data.roadmap || data.roadmap.length === 0) {
+                    showPlaceholderRoadmap();
+                    return;
+                }
+
+                data.roadmap.forEach((phase, phaseIndex) => {
+                    const phaseDiv = document.createElement('div');
+                    phaseDiv.className = 'roadmap-phase';
+                    phaseDiv.style.animationDelay = `${phaseIndex * 0.1}s`;
+
+                    phaseDiv.innerHTML = `
+                    <div class="phase-header">
+                        <div class="phase-number">
+                            ${phase.phase_number}
+                        </div>
+                        <div class="phase-info">
+                            <h2 class="phase-title">${phase.phase_name}</h2>
+                            <p class="phase-description">${phase.description}</p>
+                            <span class="phase-duration">⏱️ ${phase.duration}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="topics-flowchart" id="phase-${phase.phase_number}-topics">
+                        <!-- Topics will be inserted here -->
+                    </div>
+                `;
+
+                    container.appendChild(phaseDiv);
+
+                    // Add topics
+                    const topicsGrid = document.getElementById(`phase-${phase.phase_number}-topics`);
+
+                    phase.topics.forEach((topic, topicIndex) => {
+                        const topicBox = document.createElement('div');
+                        topicBox.className = 'topic-box';
+                        if (topic.is_essential) topicBox.classList.add('essential');
+                        if (topic.is_checkpoint) topicBox.classList.add('checkpoint');
+                        topicBox.style.animationDelay = `${(phaseIndex * 0.1) + (topicIndex * 0.05)}s`;
+                        topicBox.style.position = 'relative';
+
+                        // Check if topic is completed
+                        const isCompleted = completedTopicIds.includes(topic.id);
+                        if (isCompleted) {
+                            topicBox.style.opacity = '0.7';
+                            topicBox.style.borderColor = 'var(--success)';
+                        }
+
+                        topicBox.innerHTML = `
+                        <div style="position: absolute; top: 1rem; right: 1rem; z-index: 10;">
+                            <input type="checkbox" 
+                                   id="topic-${topic.id}" 
+                                   class="topic-checkbox"
+                                   onchange="toggleTopicProgress(${topic.id}, this.checked)"
+                                   ${isCompleted ? 'checked' : ''}
+                                   style="width: 20px; height: 20px; cursor: pointer;">
+                        </div>
+                        
+                        <div class="topic-header">
+                            <h3 class="topic-name">${topic.topic_name}</h3>
+                            ${topic.is_essential ? '<span class="essential-badge">⭐ Essential</span>' : ''}
+                            ${topic.is_checkpoint ? '<span class="checkpoint-badge">🎯 Checkpoint</span>' : ''}
+                        </div>
+                        
+                        <p class="topic-description">${topic.description}</p>
+                        
+                        <div class="topic-footer">
+                            <span class="topic-type">${topic.resource_type}</span>
+                            <a href="${topic.resource_link}" target="_blank" class="learn-btn">
+                                Learn Now →
+                            </a>
+                        </div>
+                    `;
+
+                        topicsGrid.appendChild(topicBox);
+
+                        // Add checkpoint message after checkpoint topics
+                        if (topic.is_checkpoint) {
+                            const checkpoint = document.createElement('div');
+                            checkpoint.className = 'checkpoint-message';
+                            checkpoint.textContent = '🎯 Checkpoint! Build a project using what you\'ve learned before continuing.';
+                            topicsGrid.appendChild(checkpoint);
+                        }
+                    });
+                });
+
+                // Add completion card
+                const completionCard = document.createElement('div');
+                completionCard.className = 'completion-card';
+                completionCard.innerHTML = `
+                <div class="completion-icon">🎉</div>
+                <h2>Congratulations!</h2>
+                <p>Complete this roadmap to become a professional ${data.role.role_name}</p>
+                <p style="margin-top: 1rem; font-size: 1rem; opacity: 0.9;">
+                    💡 Pro Tip: Build projects at each checkpoint to solidify your learning!
+                </p>
+            `;
+                container.appendChild(completionCard);
+            }
+
+            function showPlaceholderRoadmap() {
+                document.getElementById('loading').style.display = 'none';
+
+                const container = document.getElementById('roadmapContainer');
+                container.innerHTML = `
+                <div style="background: var(--bg-secondary); padding: 3rem; border-radius: var(--border-radius-lg); text-align: center; box-shadow: var(--shadow-md);">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🚧</div>
+                    <h2 style="font-size: 2rem; margin-bottom: 1rem;">Roadmap Coming Soon!</h2>
+                    <p style="color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+                        We're currently building detailed roadmaps for all 59 career roles. 
+                        This role's roadmap will be available soon!
+                    </p>
+                    <p style="margin-top: 2rem;">
+                        <a href="/roles" class="btn btn-primary">
+                            ← Back to Career Matches
+                        </a>
+                    </p>
+                </div>
+                `;
+            }
+        }
+
+        // Call the function to load roadmap with progress
+        loadRoadmapWithProgress();
+
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        themeToggle.checked = (currentTheme === 'dark');
+        themeToggle.addEventListener('change', function () {
+            const newTheme = this.checked ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+
+</html>

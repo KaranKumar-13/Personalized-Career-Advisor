@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Career Matches - Career Compass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+    <!-- Theme Toggle Switch -->
+    <div class="theme-switch-container">
+        <label class="theme-switch">
+            <input type="checkbox" id="themeToggle">
+            <span class="slider">
+                <span class="sun-icon">☀️</span>
+                <span class="moon-icon">🌙</span>
+            </span>
+        </label>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="header-title">Your Perfect Career Matches</h1>
+            <p class="header-subtitle" id="userGreeting">Based on your unique profile</p>
+        </header>
+
+        <!-- Back Button -->
+        <button onclick="window.location.href='/'" class="btn btn-secondary" style="margin-bottom: 2rem;">
+            ← Back to Profile
+        </button>
+
+        <!-- Roles Grid -->
+        <div class="roles-grid" id="rolesContainer">
+            <!-- Role cards will be inserted here by JavaScript -->
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Finding your perfect career matches...</p>
+        </div>
+    </div>
+
+    <script>
+        // Get data from localStorage
+        const rolesData = JSON.parse(localStorage.getItem('rolesData') || '{}');
+
+        if (!rolesData.roles) {
+            window.location.href = '/';
+        }
+
+        // Update greeting
+        document.getElementById('userGreeting').textContent =
+            `Hi ${rolesData.user_name}! Here are your top career matches`;
+
+        // Hide loading
+        document.getElementById('loading').style.display = 'none';
+
+        // Render roles
+        const container = document.getElementById('rolesContainer');
+
+        rolesData.roles.forEach((role, index) => {
+            const compat = role.compatibility;
+            const breakdown = compat.breakdown;
+
+            const roleCard = document.createElement('div');
+            roleCard.className = 'role-card';
+            roleCard.style.animationDelay = `${index * 0.1}s`;
+
+            roleCard.innerHTML = `
+                <div class="role-card-header">
+                    <h3 class="role-title">${role.role_name}</h3>
+                    <div class="compatibility-badge">
+                        <div class="compatibility-score">${Math.round(compat.score)}%</div>
+                        <div class="compatibility-grade">${compat.grade}</div>
+                    </div>
+                </div>
+                
+                <div class="compatibility-level">${compat.match_level}</div>
+                
+                <p class="role-description">${role.description}</p>
+                
+                <div class="compatibility-breakdown">
+                    <h4 class="breakdown-title">Match Breakdown</h4>
+                    
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">
+                            <span>Specialization Match</span>
+                            <span>${breakdown.specialization}/30</span>
+                        </div>
+                        <div class="breakdown-bar-container">
+                            <div class="breakdown-bar" style="width: ${(breakdown.specialization / 30) * 100}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">
+                            <span>Skills Match</span>
+                            <span>${breakdown.skills}/45</span>
+                        </div>
+                        <div class="breakdown-bar-container">
+                            <div class="breakdown-bar" style="width: ${(breakdown.skills / 45) * 100}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">
+                            <span>Interest Alignment</span>
+                            <span>${breakdown.interest}/20</span>
+                        </div>
+                        <div class="breakdown-bar-container">
+                            <div class="breakdown-bar" style="width: ${(breakdown.interest / 20) * 100}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="breakdown-item">
+                        <div class="breakdown-label">
+                            <span>Career Goals</span>
+                            <span>${breakdown.goals}/5</span>
+                        </div>
+                        <div class="breakdown-bar-container">
+                            <div class="breakdown-bar" style="width: ${(breakdown.goals / 5) * 100}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: var(--bg-tertiary); border-radius: var(--border-radius-sm); padding: 0.75rem; margin: 0.75rem 0;">
+                    <h4 style="font-size: 0.875rem; margin-bottom: 0.4rem; font-weight: 700;">
+                        ✅ Why You're a Great Match:
+                    </h4>
+                    ${breakdown.spec_reason ? `<p style="font-size: 0.85rem; margin-bottom: 0.25rem;">• ${breakdown.spec_reason}</p>` : ''}
+
+                    ${breakdown.interest_reason ? `<p style="font-size: 0.85rem; margin-bottom: 0.25rem;">• ${breakdown.interest_reason}</p>` : ''}
+                    
+                    ${breakdown.bonus_list && breakdown.bonus_list.length > 0 ? `
+                        <div style="margin-top: 0.4rem; padding-top: 0.4rem; border-top: 1px solid var(--border-color);">
+                            <p style="font-size: 0.8rem; font-weight: 600; margin-bottom: 0.25rem;">🎁 Bonuses:</p>
+                            ${breakdown.bonus_list.map(bonus => `<p style="font-size: 0.8rem; margin-bottom: 0.15rem;">• ${bonus}</p>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 0.75rem 0; padding: 0.75rem; background: var(--bg-tertiary); border-radius: var(--border-radius-sm);">
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">💰 Salary</div>
+                        <div style="font-weight: 700; margin-top: 0.25rem; font-size: 0.9rem;">${role.salary}</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">📈 Demand</div>
+                        <div style="font-weight: 700; margin-top: 0.25rem; font-size: 0.9rem;">${role.demand}</div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <button class="btn btn-secondary" style="width: 100%;" 
+                            onclick="enrollInRole(${role.role_id}, '${role.role_name}')">
+                        📚 Enroll
+                    </button>
+                    <button class="btn btn-primary" style="width: 100%;" 
+                            onclick="viewRoadmap(${role.role_id}, '${role.role_name}')">
+                        View Roadmap →
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(roleCard);
+        });
+
+        async function enrollInRole(roleId, roleName) {
+            try {
+                const response = await fetch('/api/enroll', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ role_id: roleId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(`✅ ${data.message}\n\nCheck your dashboard to track your progress!`);
+                } else {
+                    alert(`❌ ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Enrollment error:', error);
+                alert('Failed to enroll. Please try again.');
+            }
+        }
+
+        function viewRoadmap(roleId, roleName) {
+            localStorage.setItem('selectedRole', JSON.stringify({
+                id: roleId,
+                name: roleName
+            }));
+            window.location.href = `/roadmap/${roleId}`;
+        }
+
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', currentTheme);
+
+        // Update checkbox state based on current theme
+        themeToggle.checked = (currentTheme === 'dark');
+
+        // Toggle theme on checkbox change
+        themeToggle.addEventListener('change', function () {
+            const newTheme = this.checked ? 'dark' : 'light';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+
+</html>

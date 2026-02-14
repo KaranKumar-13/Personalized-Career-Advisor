@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Compass - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 1rem auto 4rem auto;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all var(--transition-base);
+        }
+
+        .login-tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: -2px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .auth-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="text-align: center; padding-top: 2rem;">
+        <h1 class="header-title"
+            style="display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center; margin-bottom: 2rem;">
+            🚀 Career Compass</h1>
+    </div>
+
+    <div class="container">
+
+        <div class="login-container">
+            <div class="login-tabs">
+                <div class="login-tab active" onclick="switchTab('student')">👨‍🎓 Student</div>
+                <div class="login-tab" onclick="switchTab('parent')">👨‍👩‍👧‍👦 Parent</div>
+            </div>
+
+            <form id="loginForm" method="POST" action="/login">
+                <input type="hidden" name="user_type" id="userType" value="student">
+                <input type="hidden" name="action" id="formAction" value="login">
+
+                <h2 style="text-align: center; margin-bottom: 1.5rem;" id="formTitle">Student Login</h2>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-input" required placeholder="Enter your email">
+                </div>
+
+                <div class="form-group" id="nameGroup" style="display: none;">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" class="form-input" placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-input" required placeholder="Enter password">
+                </div>
+
+                <div class="form-group" id="childEmailGroup" style="display: none;">
+                    <label class="form-label">Child's Email</label>
+                    <input type="email" name="child_email" class="form-input"
+                        placeholder="Enter your child's email address">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="submitBtn">Login</button>
+
+                <div class="auth-switch">
+                    <span id="switchText">Don't have an account?</span>
+                    <a onclick="toggleSignup()" id="switchBtn">Sign Up</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let isSignup = false;
+        let currentUserType = 'student';
+
+        function switchTab(type) {
+            currentUserType = type;
+            document.getElementById('userType').value = type;
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            updateFormUI();
+        }
+
+        function toggleSignup() {
+            isSignup = !isSignup;
+            document.getElementById('formAction').value = isSignup ? 'register' : 'login';
+            updateFormUI();
+        }
+
+        function updateFormUI() {
+            const title = document.getElementById('formTitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const switchText = document.getElementById('switchText');
+            const switchBtn = document.getElementById('switchBtn');
+            const nameGroup = document.getElementById('nameGroup');
+            const nameInput = nameGroup.querySelector('input');
+
+            let typeLabel = currentUserType.charAt(0).toUpperCase() + currentUserType.slice(1);
+
+            if (isSignup) {
+                title.innerText = `Create ${typeLabel} Account`;
+                submitBtn.innerText = 'Sign Up';
+                switchText.innerText = 'Already have an account?';
+                switchBtn.innerText = 'Login';
+                nameGroup.style.display = 'block';
+                nameInput.required = true;
+            } else {
+                title.innerText = `${typeLabel} Login`;
+                submitBtn.innerText = 'Login';
+                switchText.innerText = "Don't have an account?";
+                switchBtn.innerText = 'Sign Up';
+                nameGroup.style.display = 'none';
+                nameInput.required = false;
+            }
+
+            // Child Email Logic
+            const childGroup = document.getElementById('childEmailGroup');
+            const childInput = childGroup.querySelector('input');
+
+            if (currentUserType === 'parent') {
+                childGroup.style.display = 'block';
+                // Only require it if we want to enforce linking on sign up/login
+                // The user request says "opening their own child' report", so let's make it required for simplicity
+                childInput.required = true;
+            } else {
+                childGroup.style.display = 'none';
+                childInput.required = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

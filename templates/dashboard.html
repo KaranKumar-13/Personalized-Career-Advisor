@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard - Career Compass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 1rem auto;
+            padding: 1rem 1.5rem;
+        }
+
+        .student-card {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: var(--border-radius-md);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            border-left: 5px solid var(--primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: var(--border-radius-sm);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .career-path {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: var(--border-radius-sm);
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-chip {
+            background: var(--primary);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle Switch -->
+    <div class="theme-switch-container">
+        <label class="theme-switch">
+            <input type="checkbox" id="themeToggle">
+            <span class="slider">
+                <span class="sun-icon">☀️</span>
+                <span class="moon-icon">🌙</span>
+            </span>
+        </label>
+    </div>
+
+    <div class="dashboard-container">
+        <header class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 class="header-title">👨‍👩‍👧‍👦 Parent Dashboard</h1>
+                    <p class="header-subtitle">Monitor your child's career aspirations and progress</p>
+                </div>
+                <a href="/logout" class="btn btn-secondary">Logout</a>
+            </div>
+        </header>
+
+        <div style="margin-bottom: 2rem;">
+            <input type="text" id="studentSearch" class="form-input" placeholder="Search by child's email address..."
+                style="width: 100%; max-width: 400px; padding: 0.8rem;">
+        </div>
+
+        <div id="studentsList">
+            {% if students %}
+            {% for student in students %}
+            <div class="student-card" data-email="{{ student.email.lower() }}">
+                <h2>👤 {{ student.name }}</h2>
+                <p>Email: {{ student.email }}</p>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ student.career_goal }}</div>
+                        <div class="stat-label">Career Goal</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ student.current_year }}</div>
+                        <div class="stat-label">Current Year</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">{{ student.specialization }}</div>
+                        <div class="stat-label">Specialization</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3>🎯 Top Career Matches</h3>
+                    <div class="career-list">
+                        {% for role in student.roles %}
+                        <div class="career-path">
+                            <div>
+                                <strong>{{ role.name }}</strong>
+                                <span
+                                    style="display: block; font-size: 0.85rem; color: var(--text-secondary);">Compatibility:
+                                    {{ role.score }}%</span>
+                            </div>
+                            <span class="btn btn-sm btn-secondary">View Roadmap</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3>💪 Skills Profile</h3>
+                    <div class="skill-list">
+                        {% for skill in student.skills %}
+                        <span class="skill-chip">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3>❤️ Interest Areas</h3>
+                    <div class="skill-list">
+                        {% for interest in student.interests %}
+                        <span class="skill-chip" style="background: var(--secondary);">{{ interest }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="text-align: center; padding: 4rem;">
+                <h3>No student data found linked to this account.</h3>
+                <p>Ensure your child has created an account and completed their profile.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        const searchInput = document.getElementById('studentSearch');
+        const cards = document.querySelectorAll('.student-card');
+
+        searchInput.addEventListener('input', function (e) {
+            const term = e.target.value.toLowerCase();
+            let hasResults = false;
+
+            cards.forEach(card => {
+                const email = card.dataset.email;
+                if (email.includes(term)) {
+                    card.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

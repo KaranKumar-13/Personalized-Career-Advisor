@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - Career Compass</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 1rem auto;
+            padding: 1rem 1.5rem;
+        }
+
+        .profile-overview {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--border-radius-lg);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: 700;
+        }
+
+        .profile-info h2 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .profile-info p {
+            margin: 0.5rem 0 0 0;
+            color: var(--text-secondary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: var(--border-radius-md);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .section-card {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: var(--border-radius-lg);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .skill-tag {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .skill-level {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .role-card-compact {
+            background: var(--bg-tertiary);
+            padding: 1.5rem;
+            border-radius: var(--border-radius-md);
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition-base);
+        }
+
+        .role-card-compact:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .role-info h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.2rem;
+        }
+
+        .role-info p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .role-score {
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .score-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-grade {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle Switch -->
+    <div class="theme-switch-container">
+        <label class="theme-switch">
+            <input type="checkbox" id="themeToggle">
+            <span class="slider">
+                <span class="sun-icon">☀️</span>
+                <span class="moon-icon">🌙</span>
+            </span>
+        </label>
+    </div>
+
+    <div class="dashboard-container">
+        <header class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 class="header-title">📊 My Dashboard</h1>
+                    <p class="header-subtitle">Track your career journey and progress</p>
+                </div>
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                    <a href="/home" class="btn btn-primary">🏠 Home</a>
+                    <a href="/logout" class="btn btn-secondary">Logout</a>
+                </div>
+            </div>
+        </header>
+
+        {% if not has_profile %}
+        <!-- Empty State -->
+        <div class="section-card">
+            <div class="empty-state">
+                <h3>👋 Welcome, {{ user_name }}!</h3>
+                <p>You haven't completed your profile yet. Complete your profile to get personalized career
+                    recommendations.</p>
+                <a href="/home" class="btn btn-primary btn-large">Complete Your Profile</a>
+            </div>
+        </div>
+        {% else %}
+        <!-- Profile Overview -->
+        <div class="profile-overview">
+            <div class="profile-header">
+                <div class="profile-avatar-large">{{ user_name[0].upper() }}</div>
+                <div class="profile-info">
+                    <h2>{{ user_name }}</h2>
+                    <p>{{ profile.specialization }} • Year {{ profile.current_year }}</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{ profile.skills|length }}</div>
+                    <div class="stat-label">Skills</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ profile.interest_areas|length }}</div>
+                    <div class="stat-label">Interests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ profile.career_goal }}</div>
+                    <div class="stat-label">Career Goal</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{ profile.timeline }}</div>
+                    <div class="stat-label">Timeline</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enrolled Learning Path -->
+        <div class="section-card" id="enrolledSection" style="display: none;">
+            <h3 class="section-title">📚 My Learning Path</h3>
+            <div id="enrolledContent"></div>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="section-card">
+            <h3 class="section-title">💪 Your Skills</h3>
+            <div class="skill-tags">
+                {% for skill, level in profile.skills.items() %}
+                <div class="skill-tag">
+                    <span>{{ skill }}</span>
+                    <span class="skill-level">{{ level }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Interest Areas -->
+        <div class="section-card">
+            <h3 class="section-title">❤️ Interest Areas</h3>
+            <div class="skill-tags">
+                {% for interest in profile.interest_areas %}
+                <div class="skill-tag" style="background: var(--gradient-secondary);">
+                    <span>{{ interest }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Top Career Matches -->
+        <div class="section-card">
+            <h3 class="section-title">🎯 Your Top Career Matches</h3>
+            {% for role in top_roles %}
+            <div class="role-card-compact">
+                <div class="role-info">
+                    <h3>{{ role.name }}</h3>
+                    <p>{{ role.category }} • {{ role.demand }} Demand • {{ role.salary }}</p>
+                    <p style="margin-top: 0.5rem;">{{ role.match_level }}</p>
+                </div>
+                <div class="role-score">
+                    <div class="score-value">{{ role.score }}</div>
+                    <div class="score-grade">{{ role.grade }}</div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div style="margin-top: 2rem; text-align: center;">
+                <a href="/roles" class="btn btn-primary">View All Recommendations</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Fetch and display enrolled roles
+        async function loadEnrollments() {
+            try {
+                const response = await fetch('/api/my-enrollments');
+                const data = await response.json();
+
+                if (data.success && data.enrollments.length > 0) {
+                    const enrolledSection = document.getElementById('enrolledSection');
+                    const enrolledContent = document.getElementById('enrolledContent');
+
+                    enrolledSection.style.display = 'block';
+
+                    enrolledContent.innerHTML = data.enrollments.map(enrollment => `
+                        <div class="role-card-compact" style="flex-direction: column; align-items: stretch;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <div>
+                                    <h3 style="margin: 0 0 0.5rem 0;">${enrollment.role_name}</h3>
+                                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                                        Enrolled on ${new Date(enrollment.enrolled_at).toLocaleDateString()}
+                                    </p>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">
+                                        ${enrollment.progress_percentage}%
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                                        ${enrollment.completed_topics}/${enrollment.total_topics} topics
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="background: var(--bg-tertiary); border-radius: 8px; height: 12px; overflow: hidden; margin-bottom: 1rem;">
+                                <div style="height: 100%; background: var(--gradient-primary); width: ${enrollment.progress_percentage}%; transition: width 0.3s ease;"></div>
+                            </div>
+                            
+                            <a href="/roadmap/${enrollment.role_id}" class="btn btn-primary" style="width: 100%;">
+                                Continue Learning →
+                            </a>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Failed to load enrollments:', error);
+            }
+        }
+
+        // Load enrollments on page load
+        if (document.getElementById('enrolledSection')) {
+            loadEnrollments();
+        }
+    </script>
+</body>
+
+</html>
